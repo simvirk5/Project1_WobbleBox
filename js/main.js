@@ -22,7 +22,6 @@ var lives = 0;
 var scoreLives;
 var nightsky;
 var gameTimer;
-var timerMax;
 
 function create() {
 
@@ -80,7 +79,10 @@ function create() {
 
  }
 
-
+function gameOver() {
+    scoreText = game.add.text(16, 16, 'score: 0', 
+    { font: '32px Arial', fill: '#fff'});
+}
 
 function update() {
 
@@ -88,10 +90,8 @@ function update() {
     gameTimer -= 1; 
     timer.setText('Timer: ' + gameTimer)   
 
-    if (gameTimer === timerMax) {
-
-        console.log('GameOver!')
-
+    if (gameTimer <=0 ) {
+        gameOver();
     }
 
     player.body.velocity.x = 0;
@@ -138,8 +138,7 @@ function lose (player, enemies) {
     player.kill();
     enemies.kill();
     score -= 10;
-    scoreText.setText('Score: ' + score + "Game Over!");
-    console.log("Game Over !");
+    gameOver();
 }
 
 function collectCoins (player, coin) {
