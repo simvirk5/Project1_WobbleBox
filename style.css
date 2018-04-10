@@ -4,7 +4,7 @@ body {
     background-size: 1500px 900px;
 }
 
-#gameDiv {
+canvas {
 	margin: 0 auto;
     width: 50%; 
     padding-top: 10px;  
@@ -12,13 +12,14 @@ body {
 
 #title {
 	text-align: center;
-  	display: inline-block;
   	margin: 0 auto;
+  	width: 500px;
 }
 
 h1 {
 	font-family: 'Jua', sans-serif;
 	-webkit-animation-duration: 20s;
+	-webkit-animation-iteration-count: infinite;
 	font-size: 50px;
 	margin-top: -5px;
 }
@@ -26,6 +27,7 @@ h1 {
 h2 {
 	margin-top: -25px;
 	font-family: 'Raleway', sans-serif;
+	text-decoration: underline;
 }
 
 p {
@@ -35,7 +37,7 @@ p {
 	line-height: normal;
 	animation: move 5s ease-in-out;
 	text-align: center;
+	font-weight: bold;
 }
-
 
 

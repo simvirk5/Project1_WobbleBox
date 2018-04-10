@@ -8,6 +8,7 @@ function preload() {
     game.load.image('enemy', 'assets/images/enemy_box.png');
     game.load.image('rainbow', 'assets/images/rainbow.png');
     game.load.spritesheet('unicorn', 'assets/images/dude.png', 32, 48);
+    game.load.image('winstate', 'assets/images/unicornbox.png');
 
 }
 
@@ -34,7 +35,7 @@ function create() {
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
     
-    game.stage.backgroundColor = '0x992D2D';
+    game.stage.backgroundColor = 'white';
     //background sky
     game.add.sprite(0, 0, 'sky');
     nightsky = game.add.tileSprite(0, 0, 800, 600, 'sky');
@@ -210,11 +211,15 @@ function collectCoins (player, coin) {
 }
  //win function 
 function win () {
-    scoreText = game.add.text(game.world.centerX-200, game.world.centerY-100, 'You Won!', { font: '60px Arial', fill: '#fff'});
-    clearInterval(endTimer);
+    scoreText = game.add.text(300, game.world.centerY-100, 'You Won!', { font: '60px Arial', fill: 'white'});
+    nightsky.tint = "white";
     game.paused = true;
-    console.log('gamewin');
-    
+    game.time.events.add(3000, () => {
+    game.add.sprite(0, 0, 'winstate');
+    console.log('hey');
+    },this);
 }
+    
+
 
 
