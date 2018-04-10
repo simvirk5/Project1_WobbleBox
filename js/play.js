@@ -1,4 +1,4 @@
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'gameDiv', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'gameDiv'); { preload: preload, create: create, update: update });
 
 
 function preload() {
@@ -6,12 +6,13 @@ function preload() {
     game.load.image('sky', 'assets/images/nightsky.jpg');
     game.load.image('ground', 'assets/images/platform.png');
     game.load.image('enemy', 'assets/images/enemy_box.png');
-    game.load.image('rainbow', 'assets/images/rainbow.png');
+    game.load.image('rainbow', 'assets/images/emitter.png');
     game.load.spritesheet('unicorn', 'assets/images/dude.png', 32, 48);
     game.load.image('winstate', 'assets/images/unicornbox.png');
 
 }
 
+var emitter;
 var player;
 var platforms;
 var cursors;
@@ -22,8 +23,8 @@ var coin;
 var score = 0;
 var scoreText;
 var nightsky;
-var gameTimer = 10;
-var enemiesMax = 12;
+var gameTimer = 50;
+var enemiesMax = 10;
 var enemy;
 var timer;
 var endTimer;
@@ -62,74 +63,22 @@ function create() {
     game.physics.arcade.collide(enemies);
     spawEnemy();
 
-    //create coins
-    // coins = game.add.group();
-    // coins.enableBody = true;
-    // game.physics.arcade.enable(coins);
-    // game.physics.arcade.collide(coins);
-
-///////
-
-    // coins = game.add.emitter(game.world.centerX, 0, 100);
-
-    // coins.makeParticles('rainbow');
-
-    // coins.minParticleSpeed.setTo(-100, 30);
-    // coins.maxParticleSpeed.setTo(300, 100);
-    // coins.minParticleScale = 0.1;
-    // coins.maxParticleScale = 0.5;
-    // coins.scale.setTo(0.1);
-    // coins.gravity = 50;
-    // coins.flow(1000, 500, 5, );
-
-    
+    emitter = game.add.emitter(400, 0, 100);
+    emitter.makeParticles('rainbow');
+    emitter.minParticleSpeed.setTo(-300, 30);
+    emitter.maxParticleSpeed.setTo(300, 100);
+    emitter.minParticleScale = 0.1;
+    emitter.maxParticleScale = 0.5;
+    emitter.scale.setTo(0.05);
+    emitter.gravity = 400;
+    //emit 5 particles every 20s. Each particle will live for 8s.
+    emitter.flow(8000, 20000, 1, -1);
 
     cursors = game.input.keyboard.createCursorKeys();
     scoreText = game.add.text(16, 16, 'Score: 0', { font: '32px Arial', fill: '#fff' });
     timer = game.add.text(650, 16, 'Timer : ' + gameTimer, { font: '32px Arial', fill: '#fff' });
 
 }
-
-    //create setInterval and clearInterval outside of states
-    endTimer = setInterval(function() {
-        gameTimer -= 1;
-        timer.setText('Timer: ' + gameTimer)   
-        console.log('time');
-
-        if(gameTimer <= 0) {
-            console.log('over')
-            clearInterval(endTimer);
-            win ();
-        }
-    }, 1000);
-
-//random enemies falling function
-function spawEnemy () {
-    for (var i = 0; i < enemiesMax; i++) {
-        enemy = enemies.create(Math.random()*game.world.width, 0, 'enemy');
-                // enemy = enemies.create(Math.random()*game.world.width*(i*100), 0, 'enemy');
-
-        enemy.body.gravity.y = game.rnd.integerInRange(minSpeed, maxSpeed);
-        enemy.body.bounce.set(0.8);
-        enemy.anchor.setTo(0.5);
-        enemy.checkWorldBounds = true;
-        enemy.outOfBoundsKill = true;
-    }
-}
-    
-//create gameOver function outside of states
-function gameOver() {
-    scoreText = game.add.text(game.world.centerX-200, game.world.centerY-100, 'GAME OVER!', { font: '60px Arial', fill: '#fff'});
-    nightsky.tint = "0x992D2D";
-    clearInterval(endTimer);
-    game.paused = true;
-    console.log('gameover');
-    game.time.events.add(1000, () => {
-        game.add.sprite(0, 0, 'sky');
-        console.log('hey');
-    },this);
-}
-
 //if player doesnt collide call win function
 function update () {
 
@@ -176,7 +125,7 @@ function update () {
     game.physics.arcade.collide(enemies, enemies);
     game.physics.arcade.collide(enemies, coins);
     game.physics.arcade.overlap(player, enemies, checkCollision, null, this);
-    game.physics.arcade.overlap(player, coins, collectCoins, null, this);
+    game.physics.arcade.overlap(player, emitter, collectEmitter, null, this);
 
     //change velocity and amount of enemies as time decreases
     if (timer <=50 && timer >= 48) {
@@ -195,6 +144,54 @@ function update () {
     }
 }
 
+///////////////////////////END UPDATE////////////////////////////////////////////////
+
+//random enemies falling function
+function spawEnemy () {
+    for (var i = 0; i < enemiesMax; i++) {
+        enemy = enemies.create(Math.random()*game.world.width, 0, 'enemy');
+        enemy.body.gravity.y = game.rnd.integerInRange(minSpeed, maxSpeed);
+        enemy.body.bounce.set(0.8);
+        enemy.anchor.setTo(0.5);
+        enemy.checkWorldBounds = true;
+        enemy.outOfBoundsKill = true;
+    }
+}  
+//create setInterval and clearInterval outside of states
+    endTimer = setInterval(function() {
+        gameTimer -= 1;
+        timer.setText('Timer: ' + gameTimer)   
+        console.log('time');
+
+        if(gameTimer <= 0) {
+            console.log('over')
+            clearInterval(endTimer);
+            win ();
+        }
+    }, 1000);
+
+//create gameOver function outside of states
+function gameOver() {
+    scoreText = game.add.text(game.world.centerX-200, game.world.centerY-100, 'GAME OVER!', { font: '60px Arial', fill: '#fff'});
+    nightsky.tint = "0x992D2D";
+    clearInterval(endTimer);
+    game.paused = true;
+    console.log('gameover');
+    game.time.events.add(1000, () => {
+        game.add.sprite(0, 0, 'sky');
+        console.log('hey');
+    },this);
+}
+ //win function 
+function win () {
+    scoreText = game.add.text(300, game.world.centerY-100, 'You Won!', { font: '60px Arial', fill: 'white'});
+    game.stage.backgroundColor = 'white';
+    game.paused = true;
+    game.time.events.add(3000, () => {
+    game.add.sprite(0, 0, 'winstate');
+    console.log('hey');
+    },this);
+}
 //collsion between player and enemies
 function checkCollision (player, enemies) {
     player.kill() 
@@ -204,21 +201,12 @@ function checkCollision (player, enemies) {
 }
 
 //collision between player and coins
-function collectCoins (player, coin) {
-    coin.kill();
+function collectEmitter (player, emitter) {
+    emitter.kill();
     player.body.velocity.x +=100;
-    score -=10
+    score +=10
 }
- //win function 
-function win () {
-    scoreText = game.add.text(300, game.world.centerY-100, 'You Won!', { font: '60px Arial', fill: 'white'});
-    nightsky.tint = "white";
-    game.paused = true;
-    game.time.events.add(3000, () => {
-    game.add.sprite(0, 0, 'winstate');
-    console.log('hey');
-    },this);
-}
+
     
 
 
