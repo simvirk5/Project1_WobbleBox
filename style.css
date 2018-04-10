@@ -1,6 +1,5 @@
 body {
-/*	margin: 0 auto;
-*/	background-image: url("assets/images/backgroundimg.png");
+	background-image: url("assets/images/backgroundimg.png");
 	background-repeat: no-repeat;
     background-size: 1500px 900px;
 }
@@ -13,16 +12,13 @@ body {
 
 #title {
 	text-align: center;
-	-webkit-animation-duration: 20s;
-  	-webkit-animation-delay: 2s;
   	display: inline-block;
   	margin: 0 auto;
-  	
-	
 }
 
 h1 {
 	font-family: 'Jua', sans-serif;
+	-webkit-animation-duration: 20s;
 	font-size: 50px;
 	margin-top: -5px;
 }
@@ -39,7 +35,6 @@ p {
 	line-height: normal;
 	animation: move 5s ease-in-out;
 	text-align: center;
-
 }
 
 
