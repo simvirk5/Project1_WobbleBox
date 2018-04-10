@@ -55,11 +55,8 @@ function create() {
     game.physics.arcade.enable(enemies);
     game.physics.arcade.collide(enemies);
 
-    //random player falling
     
     spawEnemy();
-
-    console.log(enemy);
 
     gameTimer = 500;
     cursors = game.input.keyboard.createCursorKeys();
@@ -70,42 +67,40 @@ function create() {
     gameOver();
  }
 
-function spawEnemy () {
-    for (var i = 12; i > 0; i--) {
+    //random enemies falling
+    function spawEnemy () {
+        for (var i = 5; i > 0; i--) {
         enemy = enemies.create(Math.random()*game.world.width, 0, 'enemy');
         enemy.body.gravity.y = game.rnd.integerInRange(50, 100);
+        enemy.anchor.setTo(0.5);
         enemy.checkWorldBounds = true;
         enemy.outOfBoundsKill = true;
     }
 }
 
-function checkEnemy () {
-    // enemies.children.forEach((enemy, i) => {
-    //    if(enemy.destroy();
-    // })
-}
-
-function gameOver() {
-    scoreText = game.add.text(16, 16, 'score: 0', 
-    { font: '32px Arial', fill: '#fff'});
+    //call this function at every instance when game is over
+    function gameOver() {
+        scoreText = game.add.text(16, 16, 'score: 0', 
+        { font: '32px Arial', fill: '#fff'});
     // game.stage.backgroundColor = '#992d2d';
 
 }
 
-function update() {
+    function update() {
 
     console.log(enemies.children.length);
-
+    //kill the enemy is it's out of the world
     enemies.children.forEach((enemy, i) => {
         if(!enemy.inWorld) {
             enemy.destroy()
         }
     })
-
+    //spawn enemy if the array of enemy is less than 1 
     if (enemies.children.length < 1) {
         spawEnemy()
     }
 
+    //call gameover function in update function
     gameOver();
     //background img scroll
     nightsky.tilePosition.x += 2;
@@ -118,15 +113,14 @@ function update() {
     enemies.children.forEach(val => {
         val.rotation+=Math.random()*0.2;
     })
-
-
+    //if game timer is 0, tell it to end game
     if (gameTimer <=0 ) {
         gameOver();
     }
-
     player.body.velocity.x = 0;
 
     //make the player move 
+
     if (cursors.left.isDown)
     {
         player.body.velocity.x = -100;
@@ -140,30 +134,30 @@ function update() {
     else {
     player.animations.stop();
     player.frame = 4;
-
     }
         
     //collision between groups 
     game.physics.arcade.collide(player, platforms);
-    game.physics.arcade.collide(enemies);
+    game.physics.arcade.collide(enemies, enemies);
     game.physics.arcade.collide(enemies, coins);
     game.physics.arcade.overlap(player, enemies, lose, null, this);
     game.physics.arcade.overlap(player, coins, collectCoins, null, this);
 
     //change velocity and amount of enemies as time decreases
-    if (timer <=90000 && timer >= 60000) {
-        enemiesMax = 20;
-            enemies.body.velocity.y +=10;
+    if (timer <=500 && timer >= 300) {
+            maxEnemies;
+            enemies.body.velocity.y = 50;
+            // coins.body.velocity.y +=10;
+    }
+    else if (timer <=300 && timer >=200) {
+            maxEnemies = 15;
+            enemies.body.velocity.y = 40;
             coins.body.velocity.y +=10;
+    }
+    else if (timer <=200 && timer >0) {
+            enemiesMax = 10; 
+            enemies.body.velocity.y = 25;
 
-    }
-    else if (timer <=60000 && timer >=30000) {
-        enemiesMx = 15;
-            enemies.body.velocity.y +=10;
-            coins.body.velocity.y +=10;
-    }
-    else if (timer <=30000 && timer >0) {
-        enemiesMax = 10; 
     }
 
 }
