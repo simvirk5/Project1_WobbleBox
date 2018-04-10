@@ -1,14 +1,46 @@
 body {
-	margin: 0 auto;
-	/*	*/
+/*	margin: 0 auto;
+*/	background-image: url("assets/images/backgroundimg.png");
+	background-repeat: no-repeat;
+    background-size: 1500px 900px;
 }
 
 #gameDiv {
-	margin: auto;
-    width: 50%;
-   
+	margin: 0 auto;
+    width: 50%; 
+    padding-top: 10px;  
 }
+
 #title {
 	text-align: center;
+	-webkit-animation-duration: 20s;
+  	-webkit-animation-delay: 2s;
+  	display: inline-block;
+  	margin: 0 auto;
+  	
+	
 }
+
+h1 {
+	font-family: 'Jua', sans-serif;
+	font-size: 50px;
+	margin-top: -5px;
+}
+
+h2 {
+	margin-top: -25px;
+	font-family: 'Raleway', sans-serif;
+}
+
+p {
+	font-size: 20px;
+	margin: 0 auto;
+	font-family: 'Raleway', sans-serif;
+	line-height: normal;
+	animation: move 5s ease-in-out;
+	text-align: center;
+
+}
+
+
 
