@@ -9,7 +9,7 @@ preload: function () {
     game.load.image('ground', 'assets/images/platform.png');
     game.load.image('enemy', 'assets/images/enemy_box.png');
     game.load.image('rainbow', 'assets/images/emitter.png');
-    game.load.spritesheet('unicorn', 'assets/images/dude.png', 32, 48);
+    game.load.image('unicorn', 'assets/images/unicorn.png');
     game.load.image('winstate', 'assets/images/unicornbox.png');
 },
 
@@ -31,22 +31,23 @@ create: function () {
     player = game.add.sprite(400, game.world.height - 150, 'unicorn');
     game.physics.arcade.enable(player);
     player.body.bounce.y = 1;
+    
     player.body.gravity.y = 300;
     player.body.collideWorldBounds = true;
     //player animations
-    player.animations.add('wait', [3,4], 10);
-    player.animations.add('left', [0, 1, 2, 3], 10, true);
-    player.animations.add('right', [5, 6, 7, 8], 10, true);
+    player.animations.add('left', true);
+    player.animations.add('right', true);
     //create enemies
     enemies = game.add.group();
     enemies.enableBody = true;
     game.physics.arcade.enable(enemies);
     game.physics.arcade.collide(enemies);
     spawnEnemy();
-        // The enemy's bullets
-    rainbow = game.add.group();
-    rainbow.enableBody = true;
-    game.physics.arcade.enable(rainbow);
+    // create rainbows
+    rainbows = game.add.group();
+    rainbows.enableBody = true;
+    game.physics.arcade.enable(rainbows);
+    getRainbows();
 
     cursors = game.input.keyboard.createCursorKeys();
     scoreText = game.add.text(16, 16, 'Score: 0', { font: '32px Arial', fill: '#fff' });
@@ -66,6 +67,7 @@ create: function () {
 
 update: function () {
     // kill the enemy if it's out of the world
+    getRainbows();
     enemies.children.forEach((enemy, i) => {
         if(!enemy.inWorld) {
             enemy.destroy()
@@ -84,42 +86,45 @@ update: function () {
     //make the player move 
     if (cursors.left.isDown) {
         player.body.velocity.x = -180;
-        player.animations.play('left');
     }
     else if (cursors.right.isDown) {
         player.body.velocity.x = 180;
-        player.animations.play('right');
     }
     else {
     player.animations.stop();
-    player.frame = 4;
     }  
     //collision between groups 
     game.physics.arcade.collide(player, platforms);
     game.physics.arcade.collide(enemies, enemies);
     game.physics.arcade.collide(enemies, coins);
     game.physics.arcade.overlap(player, enemies, checkCollision, null, this);
-    game.physics.arcade.overlap(player, rainbow, collectRainbow, null, this);
+    game.physics.arcade.overlap(player, rainbows, collectRainbow, null, this);
     //change velocity and amount of enemies as time decreases
-    if (timer <=50 && timer >= 48) {
+    if (timer <=40 && timer >= 30) {
         minSpeed += 5;
         maxSpeed += 5;
     }
-    else if (timer <=30 && timer >=28) {
+    else if (timer <=29 && timer >=20) {
         enemiesMax -= 4;
-        minSpeed += 8;
-        maxSpeed += 8;
-    }
-    else if (timer <=20 && timer >= 18) {
-        enemiesMax -= 7; 
         minSpeed += 10;
         maxSpeed += 10;
+    }
+    else if (timer <=19 && timer >= 10) {
+        enemiesMax -= 7; 
+        minSpeed += 15;
+        maxSpeed += 15;
     }
 }
 
 }
 ///////////////////////////END UPDATE////////////////////////////////////////////////
 
+function getRainbows () {
+    for (var i = 0; i < rainbows; i++) {
+        rainbow = rainbows.create(100, 0, 'rainbow');
+        rainbow.body.gravity.y = game.rnd.integerInRange(minSpeed, maxSpeed);
+    }
+} 
 function spawnEnemy () {
     for (var i = 0; i < enemiesMax; i++) {
         enemy = enemies.create(Math.random()*game.world.width, 0, 'enemy');
@@ -159,11 +164,10 @@ function checkCollision (player, enemies) {
     scoreText.text = 'Score: ' + score;
     gameOver();
 }
-
 // collision between player and coins
 function collectRainbow (player, rainbow) {
-    rainbow.kill();
-    player.body.velocity.x +=100;
+    rainbows.kill();
+    // player.body.velocity.x +=100;
     console.log('here');
     score +=10
     scoreText.text = 'Score: ' + score;
