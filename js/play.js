@@ -1,5 +1,4 @@
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'gameDiv', { preload: 'preload', create: 'create', update: 'update' });
-
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'gameDiv', { preload: preload, create: create, update: update });
 
 function preload() {
 
@@ -9,22 +8,21 @@ function preload() {
     game.load.image('rainbow', 'assets/images/emitter.png');
     game.load.spritesheet('unicorn', 'assets/images/dude.png', 32, 48);
     game.load.image('winstate', 'assets/images/unicornbox.png');
-
 }
 
-var emitter;
+//global variables
+var rainbow;
 var player;
 var platforms;
 var cursors;
 var enemies;
-// var enemiesMax;
 var coins;
 var coin;
 var score = 0;
 var scoreText;
 var nightsky;
-var gameTimer = 50;
-var enemiesMax = 10;
+var gameTimer = 20;
+var enemiesMax = 5;
 var enemy;
 var timer;
 var endTimer;
@@ -36,7 +34,6 @@ function create() {
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
     
-    game.stage.backgroundColor = 'white';
     //background sky
     game.add.sprite(0, 0, 'sky');
     nightsky = game.add.tileSprite(0, 0, 800, 600, 'sky');
@@ -61,28 +58,90 @@ function create() {
     enemies.enableBody = true;
     game.physics.arcade.enable(enemies);
     game.physics.arcade.collide(enemies);
-    spawEnemy();
+    spawnEnemy();
+        // The enemy's bullets
+    rainbow = game.add.group();
+    rainbow.enableBody = true;
+    game.physics.arcade.enable(rainbow);
 
-    emitter = game.add.emitter(400, 0, 100);
-    emitter.makeParticles('rainbow');
-    emitter.minParticleSpeed.setTo(-300, 30);
-    emitter.maxParticleSpeed.setTo(300, 100);
-    emitter.minParticleScale = 0.1;
-    emitter.maxParticleScale = 0.5;
-    emitter.scale.setTo(0.05);
-    emitter.gravity = 400;
-    //emit 5 particles every 20s. Each particle will live for 8s.
-    emitter.flow(8000, 20000, 1, -1);
+
+
+    Phaser.Particles.Arcade.Emitter.prototype.makeParticles = function () {
+
+        frames = 0;
+        quantity = this.maxParticles;
+        collide = false;
+        collideWorldBounds = false;
+        particleArguments = null; 
+    }
+
+ 
+
+
+
+
 
     cursors = game.input.keyboard.createCursorKeys();
     scoreText = game.add.text(16, 16, 'Score: 0', { font: '32px Arial', fill: '#fff' });
     timer = game.add.text(650, 16, 'Timer : ' + gameTimer, { font: '32px Arial', fill: '#fff' });
 
+    // create setInterval and clearInterval outside of states
 }
+        var endTimer = setInterval(function() {
+        gameTimer -= 1;
+        timer.setText('Timer: ' + gameTimer)   
+        console.log('time');
+
+        if(gameTimer <= 0) {
+            console.log('over')
+            clearInterval(endTimer);
+            win ();
+        }
+    }, 1000);
+
+function spawnEnemy () {
+    for (var i = 0; i < enemiesMax; i++) {
+        enemy = enemies.create(Math.random()*game.world.width, 0, 'enemy');
+        enemy.body.gravity.y = game.rnd.integerInRange(minSpeed, maxSpeed);
+        enemy.body.bounce.set(0.8);
+        enemy.anchor.setTo(0.5);
+        enemy.collideWorldBounds = true;
+        enemy.checkWorldBounds = true;
+        enemy.outOfBoundsKill = true;
+    }
+} 
+
+function gameOver() {
+    scoreText = game.add.text(game.world.centerX-200, game.world.centerY-100, 'GAME OVER!', { font: '60px Arial', fill: '#fff'});
+    nightsky.tint = "0x992D2D";
+    clearInterval(endTimer);
+    game.paused = true;
+    console.log('gameover');
+    game.time.events.add(1000, () => {
+        game.add.sprite(0, 0, 'sky');
+        console.log('hey');
+    },this);
+}
+//win function 
+function win () {
+    scoreText = game.add.text(300, game.world.centerY-100, 'You Won!', { font: '60px Arial', fill: 'white'});
+    game.time.events.add(3000, () => {
+    game.add.sprite(0, 0, 'winstate');
+    game.paused = true;
+    console.log('hey');
+    },this);
+}
+
+
 //if player doesnt collide call win function
 function update () {
 
-    //kill the enemy if it's out of the world
+   //background img scroll
+    nightsky.tilePosition.x += 2;
+
+
+
+    // kill the enemy if it's out of the world
     enemies.children.forEach((enemy, i) => {
         if(!enemy.inWorld) {
             enemy.destroy()
@@ -90,13 +149,10 @@ function update () {
         }
     })
 
-    //spawn enemy if the array of enemy is less than 1 
+    // spawn enemy if the array of enemy is less than 1 
     if (enemies.children.length < 1) {
-        spawEnemy()
+        spawnEnemy()
     }
-
-    //background img scroll
-    nightsky.tilePosition.x += 2;
 
     //adding rotation to enemies
     enemies.children.forEach(val => {
@@ -125,7 +181,7 @@ function update () {
     game.physics.arcade.collide(enemies, enemies);
     game.physics.arcade.collide(enemies, coins);
     game.physics.arcade.overlap(player, enemies, checkCollision, null, this);
-    game.physics.arcade.overlap(player, emitter, collectEmitter, null, this);
+    game.physics.arcade.overlap(player, rainbow, collectRainbow, null, this);
 
     //change velocity and amount of enemies as time decreases
     if (timer <=50 && timer >= 48) {
@@ -147,51 +203,11 @@ function update () {
 ///////////////////////////END UPDATE////////////////////////////////////////////////
 
 //random enemies falling function
-function spawEnemy () {
-    for (var i = 0; i < enemiesMax; i++) {
-        enemy = enemies.create(Math.random()*game.world.width, 0, 'enemy');
-        enemy.body.gravity.y = game.rnd.integerInRange(minSpeed, maxSpeed);
-        enemy.body.bounce.set(0.8);
-        enemy.anchor.setTo(0.5);
-        enemy.checkWorldBounds = true;
-        enemy.outOfBoundsKill = true;
-    }
-}  
-//create setInterval and clearInterval outside of states
-    endTimer = setInterval(function() {
-        gameTimer -= 1;
-        timer.setText('Timer: ' + gameTimer)   
-        console.log('time');
+ 
 
-        if(gameTimer <= 0) {
-            console.log('over')
-            clearInterval(endTimer);
-            win ();
-        }
-    }, 1000);
 
 //create gameOver function outside of states
-function gameOver() {
-    scoreText = game.add.text(game.world.centerX-200, game.world.centerY-100, 'GAME OVER!', { font: '60px Arial', fill: '#fff'});
-    nightsky.tint = "0x992D2D";
-    clearInterval(endTimer);
-    game.paused = true;
-    console.log('gameover');
-    game.time.events.add(1000, () => {
-        game.add.sprite(0, 0, 'sky');
-        console.log('hey');
-    },this);
-}
- //win function 
-function win () {
-    scoreText = game.add.text(300, game.world.centerY-100, 'You Won!', { font: '60px Arial', fill: 'white'});
-    game.stage.backgroundColor = 'white';
-    game.paused = true;
-    game.time.events.add(3000, () => {
-    game.add.sprite(0, 0, 'winstate');
-    console.log('hey');
-    },this);
-}
+
 //collsion between player and enemies
 function checkCollision (player, enemies) {
     player.kill() 
@@ -200,10 +216,11 @@ function checkCollision (player, enemies) {
     gameOver();
 }
 
-//collision between player and coins
-function collectEmitter (player, emitter) {
-    emitter.kill();
+// collision between player and coins
+function collectRainbow (player, rainbow) {
+    rainbow.kill();
     player.body.velocity.x +=100;
+    console.log('here');
     score +=10
+scoreText.text = 'Score: ' + score;
 }
-

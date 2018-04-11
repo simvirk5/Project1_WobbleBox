@@ -6,13 +6,14 @@ var titleState = {
 			font: '14px Raleway', fill: '#ffffff'
 		});
 
-		game.input.activePointer.capture = true;
+   	 	cursors = game.input.keyboard.createCursorKeys();
 	},
 
 	function update (){
 
-		if (game.input.activePointer.isDown) {
+		if (cursors.right.isDown) {
 			game.state.start('play')
 		}
 	}
-}
+}			game.state.add('title');
+			game.state.start('title');

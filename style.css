@@ -18,8 +18,8 @@ canvas {
 
 h1 {
 	font-family: 'Jua', sans-serif;
-	-webkit-animation-duration: 20s;
-	-webkit-animation-iteration-count: infinite;
+/*	-webkit-animation-duration: 20s;
+	-webkit-animation-iteration-count: infinite;*/
 	font-size: 50px;
 	margin-top: -5px;
 }
@@ -35,7 +35,6 @@ p {
 	margin: 0 auto;
 	font-family: 'Raleway', sans-serif;
 	line-height: normal;
-	animation: move 5s ease-in-out;
 	text-align: center;
 	font-weight: bold;
 
