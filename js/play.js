@@ -1,4 +1,4 @@
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'gameDiv'); { preload: preload, create: create, update: update });
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'gameDiv', { preload: 'preload', create: 'create', update: 'update' });
 
 
 function preload() {
@@ -206,8 +206,4 @@ function collectEmitter (player, emitter) {
     player.body.velocity.x +=100;
     score +=10
 }
-
-    
-
-
 

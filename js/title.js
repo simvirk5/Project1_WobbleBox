@@ -1,18 +1,27 @@
-var titleState = {
 
-	function create () {
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'gameDiv'); 
 
-		var nameLabel = game.add.text(160, 80, "Press enter to Start", {
+
+var title = {
+
+	create: function  () {
+	
+		var nameLabel = game.add.text(160, 80, "Press --> to Start", {
 			font: '14px Raleway', fill: '#ffffff'
 		});
 
-		game.input.activePointer.capture = true;
+		cursors = game.input.keyboard.createCursorKeys();
 	},
 
-	function update (){
-
-		if (game.input.activePointer.isDown) {
-			game.state.start('play')
+	update: function (){
+		console.log('update of title');
+		if (cursors.right.isDown) {
+			game.state.add('play', play);
+			game.state.start('play');
 		}
 	}
 }
+
+game.state.add('title', title);
+game.state.start('title');
+
